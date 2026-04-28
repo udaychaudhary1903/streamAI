@@ -5,6 +5,7 @@ import { HistoryIcon, ListVideoIcon, ThumbsUpIcon } from "lucide-react";
 import Link from "next/link";
 
 import { useAuth, useClerk } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 
 const items = [
     {
@@ -21,7 +22,7 @@ const items = [
     },
     {
         title: "All Playlists",
-        url: "/palylists",
+        url: "/playlists",
         icon: ListVideoIcon,
         auth: true,
     },
@@ -30,6 +31,7 @@ const items = [
 export const PersonalSection =() => {
     const clerk = useClerk();
     const { isSignedIn } = useAuth();
+    const pathname = usePathname();
 
     return (
         <SidebarGroup>
@@ -41,7 +43,7 @@ export const PersonalSection =() => {
                             <SidebarMenuButton
                                 tooltip={item.title}
                                 asChild
-                                isActive={false} //TODO: CHANGE TO LOOK AT CURRENT PATHNAME
+                                isActive={pathname === item.url} 
                                 onClick={(e) => {
                                     if (!isSignedIn && item.auth) {
                                         e.preventDefault();
@@ -49,7 +51,7 @@ export const PersonalSection =() => {
                                     }
                                 }} 
                             >
-                                <Link href={item.url} className="flex items-center gap-4">
+                                <Link prefetch href={item.url} className="flex items-center gap-4">
                                     <item.icon />
                                     <span className="text-sm">{item.title}</span>
                                 </Link>

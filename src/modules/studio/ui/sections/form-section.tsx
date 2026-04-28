@@ -46,6 +46,7 @@ import { THUMBNAIL_FALLBACK } from "@/src/modules/videos/constants";
 import { ThumbnailUploadModal } from "../components/thumbnail-upload-modal";
 import { ThumbnailGenerateModal } from "../components/thumbnail-generate-modal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { APP_URL } from "@/src/constants";
 
 interface FormSectionProps {
     videoId: string;
@@ -150,6 +151,17 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     },
   });
 
+  const revalidate = trpc.videos.revalidate.useMutation({
+    onSuccess: () => {
+      utils.studio.getMany.invalidate();
+      utils.studio.getOne.invalidate({ id: videoId });
+      toast.success("Video revalidated");
+    },
+    onError: () => {
+      toast.error("Something went wrong");
+    },
+  });
+
   const generateDescription = trpc.videos.generateDescription.useMutation({
     onSuccess: () => {
       toast.success("Description generation started", { description: "It may take a fews seconds to appear" });
@@ -189,7 +201,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
   };
   
   //TODO: change if deploying outside vercel
-  const fullUrl = `${process.env.VERCEL_URL || "http://localhost:3000"}/videos/${video.id}`;
+  const fullUrl = `${APP_URL}/videos/${videoId}`;
   const [isCopied, setIsCopied] = useState(false);
 
   const onCopy = async () => {
@@ -231,6 +243,10 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => revalidate.mutate({ id: video.id })}>
+              <RotateCcwIcon className="size-4 mr-2" />
+              Revalidate
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => remove.mutate({ id: video.id })}>
               <TrashIcon className="size-4 mr-2" />
               Delete
@@ -406,7 +422,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                     Video link
                   </p>
                   <div className="flex items-center gap-x-2">
-                    <Link href={`/videos/${video.id}`}>
+                    <Link prefetch href={`/videos/${video.id}`}>
                       <p className="line-clamp-1 text-sm text-blue-500">
                         {fullUrl}
                       </p>

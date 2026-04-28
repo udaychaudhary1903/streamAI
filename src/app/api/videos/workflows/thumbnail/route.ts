@@ -2,8 +2,8 @@ import { and, eq } from "drizzle-orm";
 import { UTApi } from "uploadthing/server";
 import { serve } from "@upstash/workflow/nextjs"
 
-import { db } from "@/db";
-import { videos } from "@/db/schema";
+import { db } from "@/src/db";
+import { videos } from "@/src/db/schema";
 
 interface InputType {
   userId: string;
@@ -36,14 +36,15 @@ export const { POST } = serve(
     const { body } = await context.call<{ data: { url: string }[] }>("generate-thumbnail", {
       url: "https://api.openai.com/v1/images/generations",
       method: "POST",
-      body: {
+      body: JSON.stringify({
         prompt,
         n: 1,
         model: "dall-e-3",
         size: "1792x1024",
-      },
+      }),
       headers: {
         authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
       },
     });
 

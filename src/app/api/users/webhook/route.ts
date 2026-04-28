@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { WebhookEvent } from '@clerk/nextjs/server'
 
-import { db } from  '@/src/db'
+import { db } from '@/src/db'
 import { users } from '@/src/db/schema'
 
 export async function POST(req: Request) {
@@ -83,7 +83,7 @@ export async function POST(req: Request) {
         imageUrl: data.image_url,
       })
       .where(eq(users.clerkId, data.id));
-  }  
+  }
 
   return new Response('Webhook received', { status: 200 })
 }

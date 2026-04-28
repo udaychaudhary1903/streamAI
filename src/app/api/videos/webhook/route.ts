@@ -11,7 +11,7 @@ import {
 } from "@mux/mux-node/resources/webhooks";
 import { mux } from "@/lib/mux";
 import { db } from "@/src/db";
-import { videos } from "@/src/db/schema";
+import { videos, livestreams } from "@/src/db/schema";
 
 const SIGNING_SECRET = process.env.MUX_WEBHOOK_SECRET!;
 
@@ -34,8 +34,53 @@ export const POST = async (request: Request) => {
     return new Response("No signature found", {status: 401});
   }
 
-  const payload = await request.json();
-  const body = JSON.stringify(payload);
+  const body = await request.text();
+  const payload = JSON.parse(body);
+
+  if (payload.type.startsWith("video.live_stream.")) {
+        try {
+            mux.webhooks.verifySignature(
+                body,
+                { "mux-signature": muxSignature },
+                process.env.MUX_WEBHOOK_SECRET!,
+            );
+        } catch {
+            return new Response("Invalid signature", { status: 401 });
+        }
+ 
+        const muxStreamId = payload.data?.id as string;
+ 
+        switch (payload.type) {
+            case "video.live_stream.active":
+                await db.update(livestreams).set({
+                    status: "active",
+                    isLive: true,
+                    startedAt: new Date(),
+                    updatedAt: new Date(),
+                }).where(eq(livestreams.muxStreamId, muxStreamId));
+                break;
+ 
+            case "video.live_stream.idle":
+            case "video.live_stream.disconnected":
+                await db.update(livestreams).set({
+                    status: "idle",
+                    isLive: false,
+                    updatedAt: new Date(),
+                }).where(eq(livestreams.muxStreamId, muxStreamId));
+                break;
+ 
+            case "video.live_stream.disabled":
+                await db.update(livestreams).set({
+                    status: "ended",
+                    isLive: false,
+                    endedAt: new Date(),
+                    updatedAt: new Date(),
+                }).where(eq(livestreams.muxStreamId, muxStreamId));
+                break;
+        }
+ 
+        return new Response("Webhook received", { status: 200 });
+    }
 
   mux.webhooks.verifySignature(
     body,
@@ -165,3 +210,4 @@ export const POST = async (request: Request) => {
 
   return new Response("Webhook received", { status: 200 });
 };
+

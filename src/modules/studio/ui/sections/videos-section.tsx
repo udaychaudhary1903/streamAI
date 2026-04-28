@@ -115,7 +115,7 @@ const VideosSectionSuspense = () => {
                     </TableHeader>
                     <TableBody>
                         {videos.pages.flatMap((page) => page.items).map((video) => (
-                            <Link href={`/studio/videos/${video.id}`} key={video.id} legacyBehavior>
+                            <Link prefetch href={`/studio/videos/${video.id}`} key={video.id} legacyBehavior>
                                 <TableRow className="cursor-pointer">
                                     
                                   <TableCell className="pl-6">
@@ -156,13 +156,13 @@ const VideosSectionSuspense = () => {
                                         {format(new Date(video.createdAt), "dd MMM yyyy")}
                                     </TableCell>
                                     <TableCell className="text-right text-sm">
-                                        views
+                                        {video.viewCount}
                                     </TableCell>
                                     <TableCell className="text-right text-sm">
-                                        comments
+                                        {video.commentCount}
                                     </TableCell>
                                     <TableCell className="text-right text-sm pr-6">
-                                        likes
+                                        {video.likeCount}
                                     </TableCell>
                                 </TableRow>
                             </Link>

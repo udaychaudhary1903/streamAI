@@ -2,15 +2,12 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 
-import { Toaster } from "sonner";
+import { TRPCProvider } from "@/src/trpc/client";
+import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
-import { TRPCProvider } from "@/src/trpc/client";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,16 +21,16 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider afterSignOutUrl="/">
-    <html lang="en">
-      <body
-        className={inter.className}
-      >
-      <TRPCProvider> 
-        <Toaster /> 
-        {children}
-      </TRPCProvider>  
-      </body>
-    </html>
+      <html lang="en">
+        <body
+          className={inter.className}
+        >
+          <TRPCProvider>
+            <Toaster />
+            {children}
+          </TRPCProvider>
+        </body>
+      </html>
     </ClerkProvider>
   );
-};
+}

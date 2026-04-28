@@ -11,10 +11,10 @@ export const StudioSidebarHeader = () => {
     if (!user) {
         return (
         <SidebarHeader className="flex items-center justify-center pb-4">
-            <Skeleton className="size-[112px] rounded-full bg-gray-200" />
+            <Skeleton className="size-[112px] rounded-full" />
             <div className="flex flex-col items-center mt-2 gap-y-1">
-                <Skeleton className="h-4 w-[80px] bg-gray-200" />
-                <Skeleton className="h-4 w-[100px] bg-gray-200" />
+                <Skeleton className="h-4 w-[80px]" />
+                <Skeleton className="h-4 w-[100px]" />
             </div>
         </SidebarHeader>
         );
@@ -24,7 +24,7 @@ export const StudioSidebarHeader = () => {
     return (
         <SidebarMenuItem>
             <SidebarMenuButton tooltip="Your Profile" asChild>
-                <Link href="/users/current">
+                <Link prefetch href="/users/current">
                     <UserAvatar
                         imageUrl={user.imageUrl}
                         name={user.fullName ?? "User"}
@@ -39,7 +39,7 @@ export const StudioSidebarHeader = () => {
 
     return (
         <SidebarHeader className="flex items-center justify-center pb-4">
-            <Link href="/users/current">
+            <Link prefetch href="/users/current">
                <UserAvatar 
                  imageUrl={user.imageUrl}
                  name={user.fullName ?? "User"}
